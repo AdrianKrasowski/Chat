@@ -15,7 +15,7 @@
         <Label Content="Message:" Height="28" HorizontalAlignment="Left" Margin="5,272,0,0" Name="label5" VerticalAlignment="Top" />
         <TextBox Height="23" HorizontalAlignment="Left" Margin="62,274,0,0" Name="messageText" VerticalAlignment="Top" Width="305" KeyUp="MessageText_KeyUp"/>
         <Button Content="Send" Height="23" HorizontalAlignment="Left" Margin="373,274,0,0" Name="sendMessageButton" VerticalAlignment="Top" Width="117" Click="SendMessageButton_Click"/>
-        <CheckBox Content="Enable Server" Height="16" HorizontalAlignment="Left" Margin="377,44,0,0" x:Name="enableServer" VerticalAlignment="Top" Checked="EnableServer_Toggle" Unchecked="EnableServer_Toggle" />
+        <Button Content="Enable Server" Height="22" HorizontalAlignment="Left" Margin="377,38,0,0" x:Name="enableServer" VerticalAlignment="Top" Click="EnableServer_Toggle" Width="99" />
         <CheckBox Content="Use Encryption" Height="16" HorizontalAlignment="Left" Margin="377,65,0,0" Name="useEncryptionBox" VerticalAlignment="Top" Checked="UseEncryptionBox_CheckedToggle" Unchecked="UseEncryptionBox_CheckedToggle" />
     </Grid>
 </Window>

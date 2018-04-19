@@ -26,7 +26,7 @@ namespace Chat
     /// </summary>
     public partial class MainWindow : Window
     {
-
+        bool server = false;
         #region Private Fields
         /// <summary>
         /// Dictionary to keep track of which peer messages have already been written to the chat window
@@ -168,11 +168,17 @@ namespace Chat
         /// <param name="e"></param>
         private void EnableServer_Toggle(object sender, RoutedEventArgs e)
         {
-            //Enable or disable the local server mode depending on the checkbox IsChecked value
-            if (enableServer.IsChecked != null && (bool)enableServer.IsChecked)
+            if (!server)
+            {
                 ToggleServerMode(true);
+                server = !server;
+            }
             else
+            {
                 ToggleServerMode(false);
+                server = !server;
+            }
+
         }
 
         /// <summary>
