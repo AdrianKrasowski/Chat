@@ -17,5 +17,6 @@
         <Button Content="Send" Height="23" HorizontalAlignment="Left" Margin="373,274,0,0" Name="sendMessageButton" VerticalAlignment="Top" Width="117" Click="SendMessageButton_Click"/>
         <Button Content="Enable Server" Height="22" HorizontalAlignment="Left" Margin="377,38,0,0" x:Name="enableServer" VerticalAlignment="Top" Click="EnableServer_Toggle" Width="99" />
         <CheckBox Content="Use Encryption" Height="16" HorizontalAlignment="Left" Margin="377,65,0,0" Name="useEncryptionBox" VerticalAlignment="Top" Checked="UseEncryptionBox_CheckedToggle" Unchecked="UseEncryptionBox_CheckedToggle" />
+        <Button Content="Sniff" Height="22" HorizontalAlignment="Left" Margin="251,10,0,0" x:Name="enableServer_Copy" VerticalAlignment="Top" Click="RunSniffer" Width="37" />
     </Grid>
 </Window>

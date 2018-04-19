@@ -18,6 +18,7 @@ using NetworkCommsDotNet.DPSBase;
 using NetworkCommsDotNet.Tools;
 using NetworkCommsDotNet.Connections;
 using NetworkCommsDotNet.Connections.TCP;
+using MJsniffer;
 
 namespace Chat
 {
@@ -26,7 +27,8 @@ namespace Chat
     /// </summary>
     public partial class MainWindow : Window
     {
-        bool server = false;
+        private bool snifferOn = false;
+        private bool server = false;
         #region Private Fields
         /// <summary>
         /// Dictionary to keep track of which peer messages have already been written to the chat window
@@ -178,6 +180,22 @@ namespace Chat
                 ToggleServerMode(false);
                 server = !server;
             }
+
+        }
+
+        /// <summary>
+        /// Toggle whether the local application is acting as a server
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RunSniffer(object sender, RoutedEventArgs e)
+        {
+            if (!snifferOn)
+            {
+                MJsniffer.Program.Main();
+                snifferOn = !snifferOn;
+            }
+
 
         }
 
