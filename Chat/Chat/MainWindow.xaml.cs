@@ -57,10 +57,10 @@ namespace Chat
         {
             InitializeComponent();
             //Write the IP addresses and ports that we are listening on to the chatBox
-            chatBox.AppendText("Initialised WPF chat example.");
+            //chatBox.Inlines.Add("Initialised WPF chat example.");
 
             //Add a blank line after the initialisation output
-            chatBox.AppendText("\n");
+            chatBox.Inlines.Add("\n");
 
             //Set the default Local Name box using to the local host name
             localName.Text = HostInfo.HostName;
@@ -84,9 +84,21 @@ namespace Chat
             //we need to wrap the append within an invoke action.
             chatBox.Dispatcher.BeginInvoke(new Action<string>((messageToAdd) =>
             {
-                chatBox.AppendText(messageToAdd + "\n");
-                chatBox.ScrollToEnd();
+                chatBox.Inlines.Add(messageToAdd + "\n");
+                chatBoxScroll.ScrollToEnd();
             }), new object[] { message });
+        }
+
+        private void AppendLineToChatBox(string title, string message)
+        {
+            //To ensure we can successfully append to the text box from any thread
+            //we need to wrap the append within an invoke action.
+            chatBox.Dispatcher.BeginInvoke(new Action<string, string>((titleToAdd, messageToAdd) =>
+             {
+                 chatBox.Inlines.Add(new Bold(new Run(titleToAdd)));
+                 chatBox.Inlines.Add(messageToAdd + "\n");
+                 chatBoxScroll.ScrollToEnd();
+             }), new object[] { title, message });
         }
 
         /// <summary>
@@ -143,13 +155,13 @@ namespace Chat
         /// <param name="e"></param>
         private void UseEncryptionBox_CheckedToggle(object sender, RoutedEventArgs e)
         {
-            if (useEncryptionBox.IsChecked != null && (bool)useEncryptionBox.IsChecked)
-            {
-                RijndaelPSKEncrypter.AddPasswordToOptions(NetworkComms.DefaultSendReceiveOptions.Options, encryptionKey);
-                NetworkComms.DefaultSendReceiveOptions.DataProcessors.Add(DPSManager.GetDataProcessor<RijndaelPSKEncrypter>());
-            }
-            else
-                NetworkComms.DefaultSendReceiveOptions.DataProcessors.Remove(DPSManager.GetDataProcessor<RijndaelPSKEncrypter>());
+            //if (useEncryptionBox.IsChecked != null && (bool)useEncryptionBox.IsChecked)
+            //{
+            //    RijndaelPSKEncrypter.AddPasswordToOptions(NetworkComms.DefaultSendReceiveOptions.Options, encryptionKey);
+            //    NetworkComms.DefaultSendReceiveOptions.DataProcessors.Add(DPSManager.GetDataProcessor<RijndaelPSKEncrypter>());
+            //}
+            //else
+            //    NetworkComms.DefaultSendReceiveOptions.DataProcessors.Remove(DPSManager.GetDataProcessor<RijndaelPSKEncrypter>());
         }
 
         /// <summary>
@@ -212,14 +224,14 @@ namespace Chat
                 Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, 0));
 
                 //Write the IP addresses and ports that we are listening on to the chatBox
-                chatBox.AppendText("Listening for incoming TCP connections on:\n");
+                chatBox.Inlines.Add("Listening for incoming TCP connections on:\n");
                 foreach (IPEndPoint listenEndPoint in Connection.ExistingLocalListenEndPoints(ConnectionType.TCP))
-                    chatBox.AppendText(listenEndPoint.Address + ":" + listenEndPoint.Port + "\n");
+                    chatBox.Inlines.Add(listenEndPoint.Address + ":" + listenEndPoint.Port + "\n");
             }
             else
             {
                 NetworkComms.Shutdown();
-                chatBox.AppendText("Server disabled. No longer accepting connections and all existing connections have been closed.");
+                chatBox.Inlines.Add("Server disabled. No longer accepting connections and all existing connections have been closed.");
             }
         }
         /// <summary>
@@ -241,7 +253,7 @@ namespace Chat
                     {
                         //If this message index is greater than the last seen from this source we can safely
                         //write the message to the ChatBox
-                        AppendLineToChatBox(incomingMessage.SourceName + " - " + incomingMessage.Message);
+                        AppendLineToChatBox(incomingMessage.SourceName + " - "+ incomingMessage.Message);
 
                         //We now replace the last received message with the current one
                         lastPeerMessageDict[incomingMessage.SourceIdentifier] = incomingMessage;
@@ -252,7 +264,7 @@ namespace Chat
                     //If we have never had a message from this source before then it has to be new
                     //by definition
                     lastPeerMessageDict.Add(incomingMessage.SourceIdentifier, incomingMessage);
-                    AppendLineToChatBox(incomingMessage.SourceName + " - " + incomingMessage.Message);
+                    AppendLineToChatBox(incomingMessage.SourceName + " - "+ incomingMessage.Message);
                 }
             }
 
@@ -337,7 +349,7 @@ namespace Chat
             lock (lastPeerMessageDict) lastPeerMessageDict[NetworkComms.NetworkIdentifier] = messageToSend;
 
             //We write our own message to the chatBox
-            AppendLineToChatBox(messageToSend.SourceName + " - " + messageToSend.Message);
+            AppendLineToChatBox(messageToSend.SourceName + ": ", messageToSend.Message);
 
             //We refresh the MessagesFrom box so that it includes our own name
             RefreshMessagesFromBox();
