@@ -28,6 +28,7 @@ namespace Chat
     {
         private bool snifferOn = false;
         private bool server = false;
+        private bool UDP = false;
         #region Private Fields
         /// <summary>
         /// Dictionary to keep track of which peer messages have already been written to the chat window
@@ -194,6 +195,19 @@ namespace Chat
 
         }
 
+        private void EnableUDP_Toggle(object sender, RoutedEventArgs e)
+        {
+            if (!UDP)
+            {
+                UDP = !UDP;
+            }
+            else
+            {
+                UDP = !UDP;
+            }
+
+        }
+
 
         /// <summary>
         /// Wrap the functionality required to enable/disable the local application server mode
@@ -318,7 +332,10 @@ namespace Chat
             ConnectionInfo serverConnectionInfo = null;
             if (serverIP.Text != "")
             {
-                try { serverConnectionInfo = new ConnectionInfo(serverIP.Text.Trim(), int.Parse(serverPort.Text)); }
+                try
+                {
+                    serverConnectionInfo = new ConnectionInfo(serverIP.Text.Trim(), int.Parse(serverPort.Text));
+                }
                 catch (Exception)
                 {
                     MessageBox.Show("Failed to parse the server IP and port. Please ensure it is correct and try again", "Server IP & Port Parse Error", MessageBoxButton.OK);
