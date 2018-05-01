@@ -18,6 +18,7 @@ using NetworkCommsDotNet.DPSBase;
 using NetworkCommsDotNet.Tools;
 using NetworkCommsDotNet.Connections;
 using NetworkCommsDotNet.Connections.TCP;
+using NetworkCommsDotNet.Connections.UDP;
 
 namespace Chat
 {
@@ -219,12 +220,24 @@ namespace Chat
             {
                 //Start listening for new incoming TCP connections
                 //Parameters ensure we listen across all adaptors using a random port
-                Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, 0));
+                if (!UDP)
+                {
+                    Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, 0));
 
-                //Write the IP addresses and ports that we are listening on to the chatBox
-                chatBox.Inlines.Add("Listening for incoming TCP connections on:\n");
-                foreach (IPEndPoint listenEndPoint in Connection.ExistingLocalListenEndPoints(ConnectionType.TCP))
-                    chatBox.Inlines.Add(listenEndPoint.Address + ":" + listenEndPoint.Port + "\n");
+                    //Write the IP addresses and ports that we are listening on to the chatBox
+                    chatBox.Inlines.Add("Listening for incoming TCP connections on:\n");
+                    foreach (IPEndPoint listenEndPoint in Connection.ExistingLocalListenEndPoints(ConnectionType.TCP))
+                        chatBox.Inlines.Add(listenEndPoint.Address + ":" + listenEndPoint.Port + "\n");
+                }
+                else
+                {
+                    Connection.StartListening(ConnectionType.UDP, new IPEndPoint(IPAddress.Any, 0));
+                    chatBox.Inlines.Add("Listening for incoming UDP connections on:\n");
+                    foreach (IPEndPoint listenEndPoint in Connection.ExistingLocalListenEndPoints(ConnectionType.UDP))
+                    {
+                        chatBox.Inlines.Add(listenEndPoint.Address + ":" + listenEndPoint.Port + "\n");
+                    }
+                }
             }
             else
             {
@@ -362,8 +375,21 @@ namespace Chat
             if (serverConnectionInfo != null)
             {
                 //We perform the send within a try catch to ensure the application continues to run if there is a problem.
-                try { TCPConnection.GetConnection(serverConnectionInfo).SendObject("ChatMessage", messageToSend); }
-                catch (CommsException) { MessageBox.Show("A CommsException occurred while trying to send message to " + serverConnectionInfo, "CommsException", MessageBoxButton.OK); }
+                try
+                {
+                    if (!UDP)
+                    {
+                        TCPConnection.GetConnection(serverConnectionInfo).SendObject("ChatMessage", messageToSend);
+                    }
+                    else
+                    {
+                        UDPConnection.GetConnection(serverConnectionInfo, UDPOptions.None).SendObject("ChatMessage", messageToSend);
+                    }
+                }
+                catch (CommsException)
+                {
+                    MessageBox.Show("A CommsException occurred while trying to send message to " + serverConnectionInfo, "CommsException", MessageBoxButton.OK);
+                }
             }
 
             //If we have any other connections we now send the message to those as well
@@ -372,7 +398,17 @@ namespace Chat
             foreach (ConnectionInfo info in otherConnectionInfos)
             {
                 //We perform the send within a try catch to ensure the application continues to run if there is a problem.
-                try { TCPConnection.GetConnection(info).SendObject("ChatMessage", messageToSend); }
+                try
+                {
+                    if (!UDP)
+                    {
+                        TCPConnection.GetConnection(info).SendObject("ChatMessage", messageToSend);
+                    }
+                    else
+                    {
+                        UDPConnection.GetConnection(info, UDPOptions.None).SendObject("ChatMessage", messageToSend);
+                    }
+                }
                 catch (CommsException) { MessageBox.Show("A CommsException occurred while trying to send message to " + info, "CommsException", MessageBoxButton.OK); }
             }
         }
