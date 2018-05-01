@@ -18,7 +18,6 @@ using NetworkCommsDotNet.DPSBase;
 using NetworkCommsDotNet.Tools;
 using NetworkCommsDotNet.Connections;
 using NetworkCommsDotNet.Connections.TCP;
-using MJsniffer;
 
 namespace Chat
 {
@@ -195,21 +194,6 @@ namespace Chat
 
         }
 
-        /// <summary>
-        /// Toggle whether the local application is acting as a server
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void RunSniffer(object sender, RoutedEventArgs e)
-        {
-            if (!snifferOn)
-            {
-                MJsniffer.Program.Main();
-                snifferOn = !snifferOn;
-            }
-
-
-        }
 
         /// <summary>
         /// Wrap the functionality required to enable/disable the local application server mode

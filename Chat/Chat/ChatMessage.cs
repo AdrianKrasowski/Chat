@@ -7,7 +7,6 @@ using System.Text;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Tools;
 using ProtoBuf;
-using MJsniffer;
 
 namespace Chat
 {
