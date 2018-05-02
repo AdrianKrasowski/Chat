@@ -19,6 +19,7 @@ using NetworkCommsDotNet.Tools;
 using NetworkCommsDotNet.Connections;
 using NetworkCommsDotNet.Connections.TCP;
 using NetworkCommsDotNet.Connections.UDP;
+using System.Diagnostics;
 
 namespace Chat
 {
@@ -87,6 +88,17 @@ namespace Chat
             {
                 chatBox.Inlines.Add(messageToAdd + "\n");
                 chatBoxScroll.ScrollToEnd();
+            }), new object[] { message });
+        }
+
+        private void AppendLineToDiagnostictBox(string message)
+        {
+            //To ensure we can successfully append to the text box from any thread
+            //we need to wrap the append within an invoke action.
+            logModule.Dispatcher.BeginInvoke(new Action<string>((messageToAdd) =>
+            {
+                logModule.Inlines.Add(messageToAdd + "\n");
+                logModuleScroll.ScrollToEnd();
             }), new object[] { message });
         }
 
@@ -379,11 +391,19 @@ namespace Chat
                 {
                     if (!UDP)
                     {
+                        Stopwatch stopwatch = Stopwatch.StartNew();
                         TCPConnection.GetConnection(serverConnectionInfo).SendObject("ChatMessage", messageToSend);
+                        stopwatch.Stop();
+                        AppendLineToDiagnostictBox("[Diagnostic] Time : " + stopwatch.ElapsedMilliseconds + "ms");
+
                     }
                     else
                     {
+                        Stopwatch stopwatch = Stopwatch.StartNew();
                         UDPConnection.GetConnection(serverConnectionInfo, UDPOptions.None).SendObject("ChatMessage", messageToSend);
+
+                        stopwatch.Stop();
+                        AppendLineToDiagnostictBox("[Diagnostic] Time : " + stopwatch.ElapsedMilliseconds + "ms");
                     }
                 }
                 catch (CommsException)
@@ -402,15 +422,131 @@ namespace Chat
                 {
                     if (!UDP)
                     {
+                        Stopwatch stopwatch = Stopwatch.StartNew();
                         TCPConnection.GetConnection(info).SendObject("ChatMessage", messageToSend);
+                        stopwatch.Stop();
+                        AppendLineToDiagnostictBox("[Diagnostic] Time : " + stopwatch.ElapsedMilliseconds + "ms");
+
                     }
                     else
                     {
+                        Stopwatch stopwatch = Stopwatch.StartNew();
                         UDPConnection.GetConnection(info, UDPOptions.None).SendObject("ChatMessage", messageToSend);
+
+                        stopwatch.Stop();
+                        AppendLineToDiagnostictBox("[Diagnostic] Time : " + stopwatch.ElapsedMilliseconds + "ms");
                     }
                 }
                 catch (CommsException) { MessageBox.Show("A CommsException occurred while trying to send message to " + info, "CommsException", MessageBoxButton.OK); }
             }
+        }
+
+        private void SendSpamMessage()
+        {
+            //If we have tried to send a zero length string we just return
+            if (messageText.Text.Trim() == "") return;
+
+            //We may or may not have entered some server connection information
+            ConnectionInfo serverConnectionInfo = null;
+            if (serverIP.Text != "")
+            {
+                try
+                {
+                    serverConnectionInfo = new ConnectionInfo(serverIP.Text.Trim(), int.Parse(serverPort.Text));
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Failed to parse the server IP and port. Please ensure it is correct and try again", "Server IP & Port Parse Error", MessageBoxButton.OK);
+                    return;
+                }
+            }
+
+            //We wrap everything we want to send in the ChatMessage class we created
+            ChatMessage messageToSend = new ChatMessage(NetworkComms.NetworkIdentifier, localName.Text, messageText.Text, messageSendIndex++);
+
+            //We add our own message to the message history in-case it gets relayed back to us
+            lock (lastPeerMessageDict) lastPeerMessageDict[NetworkComms.NetworkIdentifier] = messageToSend;
+
+            //We write our own message to the chatBox
+            AppendLineToChatBox(messageToSend.SourceName + ": ", messageToSend.Message);
+
+            //We refresh the MessagesFrom box so that it includes our own name
+            RefreshMessagesFromBox();
+
+            //We clear the text within the messageText box.
+            this.messageText.Text = "";
+
+            //If we provided server information we send to the server first
+            if (serverConnectionInfo != null)
+            {
+                //We perform the send within a try catch to ensure the application continues to run if there is a problem.
+                try
+                {
+                    if (!UDP)
+                    {
+                        Stopwatch stopwatch = Stopwatch.StartNew();
+                        for (int i = 0; i < 1000; i++)
+                        {
+                            TCPConnection.GetConnection(serverConnectionInfo).SendObject("ChatMessage", messageToSend);
+                        }
+                        stopwatch.Stop();
+                        AppendLineToDiagnostictBox("[Diagnostic] Time : " + stopwatch.ElapsedMilliseconds + "ms");
+
+                    }
+                    else
+                    {
+                        Stopwatch stopwatch = Stopwatch.StartNew();
+                        for (int i = 0; i < 1000; i++)
+                        {
+                            UDPConnection.GetConnection(serverConnectionInfo, UDPOptions.None).SendObject("ChatMessage", messageToSend);
+                        }
+                        stopwatch.Stop();
+                        AppendLineToDiagnostictBox("[Diagnostic] Time : " + stopwatch.ElapsedMilliseconds + "ms");
+                    }
+                }
+                catch (CommsException)
+                {
+                    MessageBox.Show("A CommsException occurred while trying to send message to " + serverConnectionInfo, "CommsException", MessageBoxButton.OK);
+                }
+            }
+
+            //If we have any other connections we now send the message to those as well
+            //This ensures that if we are the server everyone who is connected to us gets our message
+            var otherConnectionInfos = (from current in NetworkComms.AllConnectionInfo() where current != serverConnectionInfo select current).ToArray();
+            foreach (ConnectionInfo info in otherConnectionInfos)
+            {
+                //We perform the send within a try catch to ensure the application continues to run if there is a problem.
+                try
+                {
+                    if (!UDP)
+                    {
+                        Stopwatch stopwatch = Stopwatch.StartNew();
+                        for (int i = 0; i < 1000; i++)
+                        {
+                            TCPConnection.GetConnection(info).SendObject("ChatMessage", messageToSend);
+                        }
+                        stopwatch.Stop();
+                        AppendLineToDiagnostictBox("[Diagnostic] Time : " + stopwatch.ElapsedMilliseconds + "ms");
+
+                    }
+                    else
+                    {
+                        Stopwatch stopwatch = Stopwatch.StartNew();
+                        for (int i = 0; i < 1000; i++)
+                        {
+                            UDPConnection.GetConnection(info, UDPOptions.None).SendObject("ChatMessage", messageToSend);
+                        }
+                        stopwatch.Stop();
+                        AppendLineToDiagnostictBox("[Diagnostic] Time : " + stopwatch.ElapsedMilliseconds + "ms");
+                    }
+                }
+                catch (CommsException) { MessageBox.Show("A CommsException occurred while trying to send message to " + info, "CommsException", MessageBoxButton.OK); }
+            }
+        }
+
+        private void SendMessageSpamButton_Click(object sender, RoutedEventArgs e)
+        {
+            SendSpamMessage();
         }
     }
 }

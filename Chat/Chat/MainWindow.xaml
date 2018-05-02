@@ -31,8 +31,9 @@
         <CheckBox Content="Włącz serwer" Height="16" HorizontalAlignment="Left" Margin="19,55,0,0" x:Name="enableServer" VerticalAlignment="Top" Checked="EnableServer_Toggle" Unchecked="EnableServer_Toggle" Grid.ColumnSpan="2" RenderTransformOrigin="0.584,1.5" Grid.Column="1" Width="87" />
         <CheckBox Content="Włącz UDP" Height="16" HorizontalAlignment="Left" Margin="19,76,0,0" x:Name="enableServer_Copy" VerticalAlignment="Top" Checked="EnableUDP_Toggle" Unchecked="EnableUDP_Toggle" Grid.ColumnSpan="2" RenderTransformOrigin="0.584,1.5" Grid.Column="1" Width="75" />
 
-        <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="2" Grid.ColumnSpan="4" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="White" Margin="9,24,10,10" Grid.Column="1">
+        <ScrollViewer x:Name="logModuleScroll" VerticalScrollBarVisibility="Auto" Grid.Row="2" Grid.ColumnSpan="4" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="White" Margin="9,24,10,10" Grid.Column="1">
             <TextBlock TextWrapping="Wrap" x:Name="logModule" Height="81" Width="475"  />
         </ScrollViewer>
+        <Button Grid.Row="2" Content="Wyślij Spam" Height="23" HorizontalAlignment="Left" Margin="11.333,0.333,0,0" x:Name="sendMessageSpamButton" VerticalAlignment="Top" Width="117" Click="SendMessageSpamButton_Click" Grid.ColumnSpan="2" Grid.Column="1"/>
     </Grid>
 </Window>
