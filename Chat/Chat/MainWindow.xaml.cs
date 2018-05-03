@@ -95,11 +95,12 @@ namespace Chat
         {
             //To ensure we can successfully append to the text box from any thread
             //we need to wrap the append within an invoke action.
-            logModule.Dispatcher.BeginInvoke(new Action<string>((messageToAdd) =>
+            diagBox.Dispatcher.BeginInvoke(new Action<string, string>((titleToAdd, messageToAdd) =>
             {
-                logModule.Inlines.Add(messageToAdd + "\n");
-                logModuleScroll.ScrollToEnd();
-            }), new object[] { message });
+                diagBox.Inlines.Add(new Bold(new Run(titleToAdd)));
+                diagBox.Inlines.Add(messageToAdd + "\n");
+                diagBoxScroll.ScrollToEnd();
+            }), new object[] { "[Diagnostic]", message });
         }
 
         private void AppendLineToChatBox(string title, string message)
@@ -394,7 +395,7 @@ namespace Chat
                         Stopwatch stopwatch = Stopwatch.StartNew();
                         TCPConnection.GetConnection(serverConnectionInfo).SendObject("ChatMessage", messageToSend);
                         stopwatch.Stop();
-                        AppendLineToDiagnostictBox("[Diagnostic] Time : " + stopwatch.ElapsedMilliseconds + "ms");
+                        AppendLineToDiagnostictBox("Time : " + stopwatch.ElapsedMilliseconds + "ms");
 
                     }
                     else
@@ -403,7 +404,7 @@ namespace Chat
                         UDPConnection.GetConnection(serverConnectionInfo, UDPOptions.None).SendObject("ChatMessage", messageToSend);
 
                         stopwatch.Stop();
-                        AppendLineToDiagnostictBox("[Diagnostic] Time : " + stopwatch.ElapsedMilliseconds + "ms");
+                        AppendLineToDiagnostictBox("Time : " + stopwatch.ElapsedMilliseconds + "ms");
                     }
                 }
                 catch (CommsException)
@@ -425,7 +426,7 @@ namespace Chat
                         Stopwatch stopwatch = Stopwatch.StartNew();
                         TCPConnection.GetConnection(info).SendObject("ChatMessage", messageToSend);
                         stopwatch.Stop();
-                        AppendLineToDiagnostictBox("[Diagnostic] Time : " + stopwatch.ElapsedMilliseconds + "ms");
+                        AppendLineToDiagnostictBox("Time : " + stopwatch.ElapsedMilliseconds + "ms");
 
                     }
                     else
@@ -434,7 +435,7 @@ namespace Chat
                         UDPConnection.GetConnection(info, UDPOptions.None).SendObject("ChatMessage", messageToSend);
 
                         stopwatch.Stop();
-                        AppendLineToDiagnostictBox("[Diagnostic] Time : " + stopwatch.ElapsedMilliseconds + "ms");
+                        AppendLineToDiagnostictBox("Time : " + stopwatch.ElapsedMilliseconds + "ms");
                     }
                 }
                 catch (CommsException) { MessageBox.Show("A CommsException occurred while trying to send message to " + info, "CommsException", MessageBoxButton.OK); }
@@ -490,7 +491,7 @@ namespace Chat
                             TCPConnection.GetConnection(serverConnectionInfo).SendObject("ChatMessage", messageToSend);
                         }
                         stopwatch.Stop();
-                        AppendLineToDiagnostictBox("[Diagnostic] Time : " + stopwatch.ElapsedMilliseconds + "ms");
+                        AppendLineToDiagnostictBox("Time : " + stopwatch.ElapsedMilliseconds + "ms");
 
                     }
                     else
@@ -501,7 +502,7 @@ namespace Chat
                             UDPConnection.GetConnection(serverConnectionInfo, UDPOptions.None).SendObject("ChatMessage", messageToSend);
                         }
                         stopwatch.Stop();
-                        AppendLineToDiagnostictBox("[Diagnostic] Time : " + stopwatch.ElapsedMilliseconds + "ms");
+                        AppendLineToDiagnostictBox("Time : " + stopwatch.ElapsedMilliseconds + "ms");
                     }
                 }
                 catch (CommsException)
@@ -526,7 +527,7 @@ namespace Chat
                             TCPConnection.GetConnection(info).SendObject("ChatMessage", messageToSend);
                         }
                         stopwatch.Stop();
-                        AppendLineToDiagnostictBox("[Diagnostic] Time : " + stopwatch.ElapsedMilliseconds + "ms");
+                        AppendLineToDiagnostictBox("Time : " + stopwatch.ElapsedMilliseconds + "ms");
 
                     }
                     else
@@ -537,7 +538,7 @@ namespace Chat
                             UDPConnection.GetConnection(info, UDPOptions.None).SendObject("ChatMessage", messageToSend);
                         }
                         stopwatch.Stop();
-                        AppendLineToDiagnostictBox("[Diagnostic] Time : " + stopwatch.ElapsedMilliseconds + "ms");
+                        AppendLineToDiagnostictBox("Time : " + stopwatch.ElapsedMilliseconds + "ms");
                     }
                 }
                 catch (CommsException) { MessageBox.Show("A CommsException occurred while trying to send message to " + info, "CommsException", MessageBoxButton.OK); }
