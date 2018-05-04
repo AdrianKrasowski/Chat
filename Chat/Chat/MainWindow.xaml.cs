@@ -238,14 +238,14 @@ namespace Chat
                     Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, 0));
 
                     //Write the IP addresses and ports that we are listening on to the chatBox
-                    chatBox.Inlines.Add("Listening for incoming TCP connections on:\n");
+                    chatBox.Inlines.Add("Serwer TCP został uruchomiony na następujących interfejsach:\n");
                     foreach (IPEndPoint listenEndPoint in Connection.ExistingLocalListenEndPoints(ConnectionType.TCP))
                         chatBox.Inlines.Add(listenEndPoint.Address + ":" + listenEndPoint.Port + "\n");
                 }
                 else
                 {
                     Connection.StartListening(ConnectionType.UDP, new IPEndPoint(IPAddress.Any, 0));
-                    chatBox.Inlines.Add("Listening for incoming UDP connections on:\n");
+                    chatBox.Inlines.Add("Serwer UDP został uruchomiony na następujących interfejsach:\n");
                     foreach (IPEndPoint listenEndPoint in Connection.ExistingLocalListenEndPoints(ConnectionType.UDP))
                     {
                         chatBox.Inlines.Add(listenEndPoint.Address + ":" + listenEndPoint.Port + "\n");
@@ -255,7 +255,7 @@ namespace Chat
             else
             {
                 NetworkComms.Shutdown();
-                chatBox.Inlines.Add("Server disabled. No longer accepting connections and all existing connections have been closed.");
+                chatBox.Inlines.Add("Serwer zamknięty. Wszystkie dotychczasowe połączneia zostaną rozłączone.");
             }
         }
         /// <summary>
